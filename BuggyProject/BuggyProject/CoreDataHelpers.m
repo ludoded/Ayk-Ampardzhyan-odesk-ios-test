@@ -51,8 +51,22 @@
 		result = [NSArray array];
 		NSLog(@"%@", [error localizedFailureReason]);
 	}
-	
+	if ([name isEqualToString:@"AllModels"])
+        result = [CoreDataHelpers sortAllModelsRequest:result];
+    
 	return result;
+}
+
++ (NSArray *)sortAllModelsRequest:(NSArray *)array
+{
+    NSMutableArray * res = [@[] mutableCopy];
+    NSSortDescriptor *nameModelDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"modelName" ascending:YES];
+    NSSortDescriptor *nameOwnerDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"owner.ownerName" ascending:YES];
+    NSArray * sortedArray = [array sortedArrayUsingDescriptors:@[nameModelDescriptor, nameOwnerDescriptor]];
+    for (ModelsEntity * me in sortedArray)
+        [res addObject:@[me.modelName, me.owner.ownerName]];
+    
+    return res;
 }
 
 + (void)fillUnsortedData {
@@ -83,7 +97,7 @@
 	modelA1.modelId = @1;
 	modelA1.modelName = @"Model A1";
 	modelA1.owner = ownerA;
-	
+    	
 	[CoreDataHelpers saveCurrentContext];
 }
 
